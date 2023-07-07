@@ -6,7 +6,7 @@ class InputValues:
 
     def __call__(self, func):     # func - ссылка на декорируемую функцию
         def wrapper(*args, **kwargs):
-            value = func()
+            value = func(*args, **kwargs)
             result = list(map(self.render, value.split()))
             return result
         return wrapper
@@ -15,15 +15,15 @@ class InputValues:
 class RenderDigit:
 
     def __call__(self, string: str):
-        if string.isdigit():
+        try:
             return int(string)
-        elif string[1:].isdigit() and string.startswith('-'):
-            return int(string)
-        return
+        except ValueError:
+            return
 
 
-render = RenderDigit()
-dg = InputValues(render)
-input_dg = dg(input)
-res = input_dg()
-print(res)
+@InputValues(RenderDigit())
+def input_dg():
+    return input()
+
+
+print(input_dg())
